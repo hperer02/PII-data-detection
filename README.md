@@ -26,8 +26,8 @@ For each document in the test set, you must predict which token values have a po
 The file should contain a header and have the following format:
 
 row_id,document,token,label
-0,7,9,B-NAME_STUDENT
-1,7,10,I-NAME_STUDENT
+0,7,9,B-NAME_STUDENT <br />
+1,7,10,I-NAME_STUDENT <br />
 2,10,0,B-NAME_STUDENT
 etc.
 
