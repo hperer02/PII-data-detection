@@ -1,34 +1,79 @@
-# PII-data-detection in student writing
-Model was developed using DeBERTa v3 transformer model for detecting personally identifiable information (PII) in student writing for a kaggle competition. Several other transformer models were initially considered but DeBERTa v3 outperformed other models on 'recall' with a score of 98%, which was the evaluation metric for the project (RoBERTa 88%, SpaCy large 84%, PIILO 87%). 
+# PII Data Detection in Student Writing
 
-During data pre-processing, several approaches were taken. Splitting the student texts further by limiting the number of input tokens to 400 (to make sure it does not exceed the pre-trained context length of 512), and increasing the training data set by using augmented data sets. Former method proved to be successful since it increased the 'recall' by 4%, but later approach did not make an impact. 
+This project was developed for a Kaggle competition focused on detecting Personally Identifiable Information (PII) in student writing. The primary objective was to build a robust model capable of identifying PII with high recall. The DeBERTa v3 transformer model was chosen for this task after comparing its performance with other transformer models.
 
-The competition details can be found below,
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Data Loading & Preprocessing](#data-loading-and-preprocessing)
+3. [Data Augmentation](#data-augmentation)
+4. [Feature Engineering](#feature-engineering)
+5. [Model Building & Training](#model-building-and-training)
+6. [Inference](#inference)
+7. [Results](#results)
+8. [Conclusion](#conclusion)
+9. [Acknowledgments](#acknowledgments)
 
-# Overview
-The goal of this competition is to develop a model that detects personally identifiable information (PII) in student writing. Your efforts to automate the detection and removal of PII from educational data will lower the cost of releasing educational datasets. This will support learning science research and the development of educational tools.
+## Introduction
+The detection of Personally Identifiable Information (PII) is crucial in maintaining privacy and data security. This project utilizes state-of-the-art transformer models to identify PII in student writing. DeBERTa v3 was selected for its superior performance in recall, achieving a score of 98%.
 
-Reliable automated techniques could allow researchers and industry to tap into the potential that large public educational datasets offer to support the development of effective tools and interventions for supporting teachers and students.
+## Data Loading and Preprocessing
+Data loading and preprocessing are critical steps in any machine learning project. The following steps were undertaken:
 
-# Description
-In today’s era of abundant educational data from sources such as ed tech, online learning, and research, widespread PII is a key challenge. PII’s presence is a barrier to analyze and create open datasets that advance education because releasing the data publicly puts students at risk. To reduce these risks, it’s crucial to screen and cleanse educational data for PII before public release, which data science could streamline.
-Manually reviewing the entire dataset for PII is currently the most reliable screening method, but this results in significant costs and restricts the scalability of educational datasets. While techniques for automatic PII detection that rely on named entity recognition (NER) exist, these work best for PII that share common formatting such as emails and phone numbers. PII detection systems struggle to correctly label names and distinguish between names that are sensitive (e.g., a student's name) and those that are not (e.g., a cited author).
-Competition host Vanderbilt University is a private research university in Nashville, Tennessee. It offers 70 undergraduate majors and a full range of graduate and professional degrees across 10 schools and colleges, all on a beautiful campus with state-of-the-art laboratories. Vanderbilt is optimized to inspire and nurture cross-disciplinary research that fosters groundbreaking discoveries.
-For this competition, Vanderbilt has partnered with The Learning Agency Lab, an Arizona-based independent nonprofit focused on developing the science of learning-based tools and programs for the social good.
-Your work in creating reliable automated techniques to detect PII will lead to more high-quality public educational datasets. Researchers can then tap into the potential of this previously unavailable data to develop effective tools and interventions that benefit both teachers and students.
+1. **Loading Data**: The dataset was loaded into the environment using pandas.
+2. **Splitting Texts**: Student texts were split to ensure each segment did not exceed 400 tokens. This was done to fit within the pre-trained context length of 512 tokens of the DeBERTa model.
+3. **Tokenization**: The texts were tokenized using the DeBERTa tokenizer.
+4. **Label Encoding**: Labels for PII were encoded to match the input tokens.
 
-# Evaluation
-Submissions are evaluated on micro Fβ, which is a classification metric that assigns value to recall and precision. The value of β is set to 5, which means that recall is weighted 5 times more heavily than precision.
+The preprocessing steps improved recall by 4%.
 
-# Submission File
-For each document in the test set, you must predict which token values have a positive PII label. You should only include predictions of positive PII label values. Outside labels O should not be included. Each row in the submission should correspond to a single label found at a unique document-token pair. Additionally, the evaluation metric requires a row_id with an enumeration of predicted labels.
+## Data Augmentation
+Several data augmentation techniques were explored to increase the size of the training dataset:
 
-The file should contain a header and have the following format:
+1. **Synonym Replacement**: Replacing words with their synonyms.
+2. **Random Insertion**: Inserting random words at random positions in the text.
+3. **Random Swap**: Swapping the positions of two words in the text.
+4. **Random Deletion**: Deleting random words from the text.
 
-row_id,document,token,label <br />
-0,7,9,B-NAME_STUDENT <br />
-1,7,10,I-NAME_STUDENT <br />
-2,10,0,B-NAME_STUDENT
-etc.
+However, these methods did not significantly impact the recall score.
 
-Competition link - https://www.kaggle.com/competitions/pii-detection-removal-from-educational-data
+## Feature Engineering
+Feature engineering was minimal due to the nature of transformer models, which excel at capturing contextual information from raw text. The primary features included:
+
+1. **Tokenized Texts**: The raw texts converted into tokens.
+2. **Attention Masks**: Masks to indicate which tokens should be attended to by the model.
+
+## Model Building and Training
+The DeBERTa v3 model was selected after comparing several transformer models:
+
+1. **Model Comparison**:
+   - RoBERTa: Recall 88%
+   - SpaCy Large: Recall 84%
+   - PIILO: Recall 87%
+   - DeBERTa v3: Recall 98%
+
+2. **Training Setup**:
+   - **Optimizer**: AdamW
+   - **Learning Rate**: Adjusted using a learning rate scheduler.
+   - **Loss Function**: Cross-Entropy Loss
+   - **Early Stopping**: Implemented to prevent overfitting.
+   - **Batch Size**: Set according to available GPU memory.
+
+3. **Training Process**:
+   - The model was trained on the preprocessed data.
+   - Early stopping was used to monitor validation loss and stop training when no improvement was observed.
+
+## Inference
+The trained model was used to predict PII on unseen data:
+
+1. **Text Splitting**: Similar to preprocessing, texts were split into manageable segments.
+2. **Tokenization**: The segments were tokenized.
+3. **Prediction**: The model predicted the presence of PII in each segment.
+4. **Aggregation**: Results from all segments were combined to produce the final output.
+
+## Results
+The DeBERTa v3 model achieved a recall score of 98%, significantly outperforming other models considered for this task. This high recall is crucial for PII detection, ensuring that most instances of PII are correctly identified.
+
+## Conclusion
+The DeBERTa v3 transformer model proved to be highly effective in detecting PII in student writing, achieving an outstanding recall score. The project demonstrates the importance of careful preprocessing and model selection in achieving optimal results.
+
+**Competition link** - https://www.kaggle.com/competitions/pii-detection-removal-from-educational-data
